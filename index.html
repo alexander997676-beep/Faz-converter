@@ -3,430 +3,469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mob i - Latest & Search</title>
+    <title>Xyro Pro Converter</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* --- CSS STYLES --- */
+        /* CSS Variables for Theming */
         :root {
-            --primary: #00e5ff; /* Cyan Blue */
-            --bg: #121212;
-            --card-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-sec: #b3b3b3;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --primary: #6366f1; /* Indigo */
+            --primary-hover: #4f46e5;
+            --accent: #8b5cf6; /* Violet */
+            --input-bg: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-main: #f9fafb;
+            --text-sub: #9ca3af;
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --input-bg: #374151;
+            --border: #4b5563;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        * { box-sizing: border-box; transition: background-color 0.3s, color 0.3s; }
 
         body {
-            background-color: var(--bg);
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
             color: var(--text-main);
-            min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
 
-        /* Navbar */
-        nav {
-            background: rgba(30, 30, 30, 0.95);
-            padding: 15px 5%;
+        /* Main Card */
+        .app-container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #333;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            margin-bottom: 2rem;
         }
 
-        .logo { font-size: 1.8rem; font-weight: 800; }
-        .logo span { color: var(--primary); }
-
-        .nav-links button {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-size: 1rem;
-            margin-left: 20px;
-            cursor: pointer;
-            padding: 5px 10px;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-        .nav-links button.active, .nav-links button:hover {
-            color: var(--primary);
-        }
-
-        /* Sections */
-        .section {
-            display: none; /* Hidden by default */
-            padding: 20px 5%;
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            animation: fadeIn 0.5s ease;
-        }
-        .section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Titles */
-        .section-title {
+        .brand {
             font-size: 1.5rem;
-            margin: 20px 0;
-            border-left: 4px solid var(--primary);
-            padding-left: 15px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Search Box Design */
-        .search-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-            margin-top: 20px;
-        }
-
-        .input-group {
-            display: flex;
-            width: 100%;
-            max-width: 600px;
-            position: relative;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 15px 20px;
-            border-radius: 50px;
-            border: 2px solid #333;
-            background: var(--card-bg);
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            padding-right: 100px; /* Space for button */
-        }
-
-        input[type="text"]:focus { border-color: var(--primary); }
-
-        button#search-btn {
-            position: absolute;
-            right: 5px;
-            top: 5px;
-            bottom: 5px;
-            padding: 0 25px;
-            border-radius: 40px;
-            border: none;
-            background: var(--primary);
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        button#search-btn:active { transform: scale(0.95); }
-
-        /* Grid System */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        /* Card Design */
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #333;
-            cursor: pointer;
-            transition: transform 0.3s;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.1);
-        }
-
-        .card img {
-            width: 100%;
-            height: 220px;
-            object-fit: contain;
-            background: #fff;
-            padding: 15px;
-        }
-
-        .card-body { padding: 15px; text-align: center; }
-        .card-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; }
-        .card-desc { font-size: 0.8rem; color: var(--text-sec); display: none; } /* Hidden in grid, shown in popup */
-
-        /* Loader */
-        .loader {
-            display: none;
-            border: 4px solid #333;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
             width: 40px;
             height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 30px auto;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* Modal (Popup) */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            justify-content: center;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            width: 100%;
-            max-width: 500px;
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid var(--primary);
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px; right: 20px;
-            font-size: 1.5rem;
+            justify-content: center;
             cursor: pointer;
-            color: #fff;
+            font-size: 1.2rem;
         }
 
-        .modal-specs ul { margin-top: 15px; list-style: none; }
-        .modal-specs li {
-            padding: 8px 0;
-            border-bottom: 1px solid #333;
-            color: var(--text-sec);
-            font-size: 0.9rem;
+        /* Inputs */
+        .input-wrapper {
+            margin-bottom: 1.5rem;
         }
-        .modal-specs strong { color: var(--primary); display: block; }
+
+        .label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.25rem;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+            font-weight: 600;
+        }
+
+        .amount-input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Currency Selectors */
+        .currency-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .select-box {
+            position: relative;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px 10px 14px 40px; /* Space for flag */
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .flag-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        /* Swap Button */
+        .swap-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .swap-btn:hover {
+            transform: rotate(180deg);
+            background: var(--primary-hover);
+        }
+
+        /* Convert Button */
+        .convert-btn {
+            width: 100%;
+            padding: 18px;
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .convert-btn:active { transform: scale(0.98); }
+
+        /* Result Section */
+        .result-card {
+            margin-top: 2rem;
+            background: var(--input-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .rate-info {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 5px;
+        }
+
+        .main-result {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 5px 0;
+            word-break: break-all;
+        }
+
+        .copy-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .copy-icon:hover { color: var(--primary); }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--border) 25%, var(--input-bg) 50%, var(--border) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+            color: transparent !important;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error { background: #ef4444; }
+        .toast.success { background: #10b981; }
 
     </style>
 </head>
 <body>
 
-    <!-- Navigation -->
-    <nav>
-        <div class="logo">mob <span>i</span></div>
-        <div class="nav-links">
-            <button id="btn-home" onclick="showPage('home')" class="active">Home</button>
-            <button id="btn-search" onclick="showPage('search')">Search</button>
+<div class="app-container">
+    <div class="header">
+        <div class="brand"><i class="fas fa-bolt"></i> Xyro Pro</div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <i class="fas fa-moon" id="theme-icon"></i>
+        </button>
+    </div>
+
+    <div class="input-wrapper">
+        <label class="label">Amount</label>
+        <input type="number" class="amount-input" id="amount" value="100" placeholder="0.00" onkeydown="if(event.key === 'Enter') convert()">
+    </div>
+
+    <div class="currency-grid">
+        <div class="select-box">
+            <span class="flag-icon" id="flag-from">🇺🇸</span>
+            <select id="from" onchange="updateFlags()">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="PKR">PKR</option>
+                <option value="INR">INR</option>
+                <option value="CAD">CAD</option>
+                <option value="AED">AED</option>
+                <option value="SAR">SAR</option>
+                <option value="JPY">JPY</option>
+                <option value="CNY">CNY</option>
+                <option value="TRY">TRY</option>
+            </select>
         </div>
-    </nav>
 
-    <!-- 1. HOME SECTION (Trending/Latest) -->
-    <section id="home-section" class="section active">
-        <h2 class="section-title">🔥 Trending Now</h2>
-        <p style="color: gray; margin-bottom: 20px;">Top latest mobile phones</p>
-        
-        <!-- Loader for Home -->
-        <div id="home-loader" class="loader"></div>
-        
-        <div class="grid" id="home-grid">
-            <!-- Trending mobiles will load here automatically -->
-        </div>
-    </section>
+        <button class="swap-btn" onclick="swap()">
+            <i class="fas fa-exchange-alt"></i>
+        </button>
 
-    <!-- 2. SEARCH SECTION -->
-    <section id="search-section" class="section">
-        <div class="search-container">
-            <div class="input-group">
-                <input type="text" id="search-input" placeholder="Search mobile (e.g. Pixel 8, iPhone 15)...">
-                <button id="search-btn" onclick="performSearch()">Search</button>
-            </div>
-        </div>
-
-        <!-- Loader for Search -->
-        <div id="search-loader" class="loader"></div>
-
-        <div class="grid" id="search-grid">
-            <!-- Search results will appear here -->
-        </div>
-    </section>
-
-    <!-- 3. DETAILS MODAL -->
-    <div class="modal" id="details-modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div style="text-align: center;">
-                <img id="modal-img" src="" style="height: 180px; margin-bottom: 10px;">
-                <h2 id="modal-title"></h2>
-            </div>
-            <div class="modal-specs" id="modal-specs"></div>
+        <div class="select-box">
+            <span class="flag-icon" id="flag-to">🇵🇰</span>
+            <select id="to" onchange="updateFlags()">
+                <option value="PKR" selected>PKR</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="INR">INR</option>
+                <option value="AED">AED</option>
+                <option value="CAD">CAD</option>
+            </select>
         </div>
     </div>
 
-    <script>
-        // API Base URL
-        const API_URL = "https://api.xyro.site/search/gsmarena";
+    <button class="convert-btn" onclick="convert()">Check Rates</button>
 
-        // ---- PAGE NAVIGATION LOGIC ----
-        function showPage(pageId) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.nav-links button').forEach(btn => btn.classList.remove('active'));
+    <div class="result-card" id="result-area" style="display:none;">
+        <i class="far fa-copy copy-icon" onclick="copyResult()" title="Copy"></i>
+        <div class="rate-info" id="unit-rate">1 USD = 0.00 PKR</div>
+        <div class="main-result" id="total-result">0.00</div>
+    </div>
+</div>
 
-            // Show selected section
-            if (pageId === 'home') {
-                document.getElementById('home-section').classList.add('active');
-                document.getElementById('btn-home').classList.add('active');
-            } else {
-                document.getElementById('search-section').classList.add('active');
-                document.getElementById('btn-search').classList.add('active');
-                // Focus on input automatically
-                setTimeout(() => document.getElementById('search-input').focus(), 100);
+<div id="toast" class="toast">Message</div>
+
+<script>
+    // --- 1. CONFIG & UTILS ---
+    const flagMap = {
+        'USD': '🇺🇸', 'EUR': '🇪🇺', 'GBP': '🇬🇧', 'PKR': '🇵🇰',
+        'INR': '🇮🇳', 'CAD': '🇨🇦', 'AED': '🇦🇪', 'SAR': '🇸🇦',
+        'JPY': '🇯🇵', 'CNY': '🇨🇳', 'TRY': '🇹🇷'
+    };
+
+    function updateFlags() {
+        document.getElementById('flag-from').textContent = flagMap[document.getElementById('from').value] || '🌐';
+        document.getElementById('flag-to').textContent = flagMap[document.getElementById('to').value] || '🌐';
+    }
+
+    function swap() {
+        const fromEl = document.getElementById('from');
+        const toEl = document.getElementById('to');
+        const temp = fromEl.value;
+        fromEl.value = toEl.value;
+        toEl.value = temp;
+        updateFlags();
+        // Optional: Trigger convert immediately on swap
+        // convert(); 
+    }
+
+    // --- 2. THEME HANDLING ---
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            icon.className = 'fas fa-moon';
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            icon.className = 'fas fa-sun';
+        }
+    }
+
+    // --- 3. API & LOGIC ---
+    async function convert() {
+        const amountInput = document.getElementById('amount');
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        const resultArea = document.getElementById('result-area');
+        const unitRateEl = document.getElementById('unit-rate');
+        const totalResultEl = document.getElementById('total-result');
+        
+        const amount = parseFloat(amountInput.value);
+
+        if (!amount || amount <= 0) {
+            showToast("Please enter a valid amount", "error");
+            return;
+        }
+
+        // Show Loading State (Skeleton)
+        resultArea.style.display = 'block';
+        totalResultEl.classList.add('skeleton');
+        unitRateEl.classList.add('skeleton');
+        totalResultEl.textContent = "0000.00"; // Placeholder for width
+
+        const url = `https://api.xyro.site/currency/convert?amount=${amount}&from=${from}&to=${to}`;
+
+        try {
+            const response = await fetch(url);
+            const json = await response.json();
+
+            // Validate specifically for "creator": "KimKiro" format
+            if (!json.status) {
+                throw new Error("API returned false status");
             }
-        }
 
-        // ---- HOME PAGE LOGIC (AUTO LOAD) ----
-        // Jaise hi page load hoga, ye chalega
-        window.addEventListener('DOMContentLoaded', () => {
-            loadHomeData();
-        });
-
-        async function loadHomeData() {
-            const grid = document.getElementById('home-grid');
-            const loader = document.getElementById('home-loader');
-
-            loader.style.display = 'block';
-
-            // Kyunki ye API "Latest" ka direct option nahi deti,
-            // Hum "Samsung" ya "iPhone" search karke trending phones dikhayenge
-            // Taaki Home page khali na rahe.
-            try {
-                // Default search for Home Page (You can change "Samsung" to "2024" or "Apple")
-                const response = await fetch(`${API_URL}?q=Samsung`);
-                const json = await response.json();
-
-                loader.style.display = 'none';
-
-                if (json.status && json.data) {
-                    // Sirf pehle 8 phones dikhayenge home page par
-                    const topPhones = json.data.slice(0, 10);
-                    renderGrid(topPhones, grid);
-                } else {
-                    grid.innerHTML = "<p>Could not load trending phones.</p>";
-                }
-            } catch (error) {
-                console.error("Home Load Error:", error);
-                loader.style.display = 'none';
-                grid.innerHTML = "<p>Check internet connection.</p>";
-            }
-        }
-
-        // ---- SEARCH LOGIC (FIXED) ----
-        async function performSearch() {
-            const query = document.getElementById('search-input').value.trim();
-            const grid = document.getElementById('search-grid');
-            const loader = document.getElementById('search-loader');
-
-            if (!query) return; // Empty search ko roko
-
-            // UI Reset
-            grid.innerHTML = "";
-            loader.style.display = 'block';
-
-            try {
-                // API Call
-                const response = await fetch(`${API_URL}?q=${encodeURIComponent(query)}`);
-                const json = await response.json();
-
-                loader.style.display = 'none';
-
-                if (json.status && json.data && json.data.length > 0) {
-                    renderGrid(json.data, grid);
-                } else {
-                    grid.innerHTML = `<p style="text-align:center; width:100%; margin-top:20px;">No results found for "${query}"</p>`;
-                }
-
-            } catch (error) {
-                console.error("Search Error:", error);
-                loader.style.display = 'none';
-                grid.innerHTML = `<p style="text-align:center; color:red; width:100%;">API Error. Please try again.</p>`;
-            }
-        }
-
-        // ---- COMMON RENDER FUNCTION ----
-        function renderGrid(data, container) {
-            container.innerHTML = ""; // Clear old data
-            data.forEach(phone => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.onclick = () => openModal(phone); // Click to open details
-
-                card.innerHTML = `
-                    <img src="${phone.thumbnail}" alt="${phone.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Img'">
-                    <div class="card-body">
-                        <div class="card-title">${phone.name}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // ---- POPUP / MODAL LOGIC ----
-        function openModal(phone) {
-            const modal = document.getElementById('details-modal');
-            const specsContainer = document.getElementById('modal-specs');
-
-            document.getElementById('modal-title').innerText = phone.name;
-            document.getElementById('modal-img').src = phone.thumbnail;
-
-            // Description Parsing (Sahi format mein)
-            specsContainer.innerHTML = "";
-            const ul = document.createElement('ul');
-
-            let desc = phone.description || "Details not available";
-            // Cleaning text
-            desc = desc.replace("Android smartphone.", "").replace("Features", "");
+            // Extract logic based on unknown inner structure of 'data'
+            let finalValue = 0;
             
-            // Splitting logic
-            let items = desc.split(/,|\./); // Comma ya full stop se split karega
-
-            items.forEach(item => {
-                let text = item.trim();
-                if (text.length > 2) {
-                    let li = document.createElement('li');
-                    // Highlight specs like GB, mAh, inches
-                    if (text.match(/\d/)) {
-                        li.innerHTML = `<strong>•</strong> ${text}`;
-                        li.style.color = "#fff"; // Brighten text with numbers
-                    } else {
-                        li.innerText = text;
-                    }
-                    ul.appendChild(li);
-                }
-            });
-
-            specsContainer.appendChild(ul);
-            modal.style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById('details-modal').style.display = "none";
-        }
-
-        // ---- ENTER KEY EVENT LISTENER ----
-        // Ye code ensure karega ki Enter dabane par search ho
-        document.getElementById('search-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                performSearch();
+            // Case A: data is just a number (e.g. "data": 27800)
+            if (typeof json.data === 'number') {
+                finalValue = json.data;
+            } 
+            // Case B: data is an object (e.g. "data": { "result": 27800 })
+            else if (typeof json.data === 'object') {
+                finalValue = json.data.result || json.data.converted || json.data.rate * amount || 0;
             }
-        });
 
-    </script>
+            if (finalValue === 0) throw new Error("Could not parse result");
+
+            // Remove Skeleton
+            totalResultEl.classList.remove('skeleton');
+            unitRateEl.classList.remove('skeleton');
+
+            // Format Numbers
+            const formattedTotal = finalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            
+            // Calculate Unit Rate (1 Unit)
+            const unitRate = finalValue / amount;
+            const formattedUnit = unitRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+
+            // Update UI
+            totalResultEl.textContent = `${formattedTotal} ${to}`;
+            unitRateEl.textContent = `1 ${from} ≈ ${formattedUnit} ${to}`;
+
+        } catch (error) {
+            console.error(error);
+            totalResultEl.classList.remove('skeleton');
+            unitRateEl.classList.remove('skeleton');
+            resultArea.style.display = 'none';
+            showToast("Conversion failed. Try again.", "error");
+        }
+    }
+
+    // --- 4. TOAST NOTIFICATIONS ---
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = `toast show ${type}`;
+        setTimeout(() => {
+            toast.className = 'toast'; // Hide
+        }, 3000);
+    }
+
+    function copyResult() {
+        const text = document.getElementById('total-result').textContent;
+        if(text && text !== "0.00") {
+            navigator.clipboard.writeText(text);
+            showToast("Result copied to clipboard!");
+        }
+    }
+
+    // Init
+    updateFlags();
+</script>
+
 </body>
 </html>
