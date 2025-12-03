@@ -3,468 +3,449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xyro Pro Converter</title>
+    <title>FAZ Hyperion Terminal</title>
     
-    <!-- Google Fonts: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* CSS Variables for Theming */
         :root {
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-sub: #6b7280;
-            --primary: #6366f1; /* Indigo */
-            --primary-hover: #4f46e5;
-            --accent: #8b5cf6; /* Violet */
-            --input-bg: #f9fafb;
-            --border: #e5e7eb;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --bg-dark: #050511;
+            --panel-bg: rgba(20, 20, 35, 0.7);
+            --primary: #00f2ff; /* Cyan */
+            --secondary: #7000ff; /* Purple */
+            --accent: #ff0055; /* Pink */
+            --text-main: #e0e0e0;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --neon-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
         }
 
-        /* Dark Mode Variables */
-        [data-theme="dark"] {
-            --bg-color: #111827;
-            --card-bg: #1f2937;
-            --text-main: #f9fafb;
-            --text-sub: #9ca3af;
-            --primary: #818cf8;
-            --primary-hover: #6366f1;
-            --input-bg: #374151;
-            --border: #4b5563;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        * { box-sizing: border-box; transition: background-color 0.3s, color 0.3s; }
+        * { box-sizing: border-box; }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(0, 242, 255, 0.1) 0%, transparent 50%);
             color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 20px;
-        }
-
-        /* Main Card */
-        .app-container {
-            background-color: var(--card-bg);
-            width: 100%;
-            max-width: 480px;
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            padding: 2rem;
-            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
-        /* Header */
-        .header {
+        /* --- TOP TICKER --- */
+        .ticker-wrap {
+            width: 100%;
+            background: #0a0a1a;
+            border-bottom: var(--glass-border);
+            overflow: hidden;
+            height: 40px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+        }
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker 30s linear infinite;
+        }
+        .ticker-item {
+            display: inline-block;
+            padding: 0 2rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* --- MAIN LAYOUT --- */
+        .terminal-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            padding: 30px;
+            height: calc(100vh - 40px);
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        .brand {
+        @media (max-width: 900px) {
+            .terminal-container { grid-template-columns: 1fr; overflow-y: auto; }
+        }
+
+        /* --- PANELS --- */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: var(--glass-border);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .panel-title {
+            font-family: 'Rajdhani', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(90deg, #fff, var(--primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .theme-toggle {
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        /* Inputs */
-        .input-wrapper {
-            margin-bottom: 1.5rem;
-        }
-
-        .label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .amount-input {
+        /* --- INPUTS --- */
+        .input-group { margin-bottom: 20px; position: relative; }
+        .input-label { font-size: 0.75rem; color: #888; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        
+        input, select {
             width: 100%;
-            padding: 16px;
-            font-size: 1.25rem;
-            border-radius: 12px;
-            border: 2px solid var(--border);
-            background: var(--input-bg);
-            color: var(--text-main);
-            outline: none;
-            font-weight: 600;
-        }
-
-        .amount-input:focus {
-            border-color: var(--primary);
-        }
-
-        /* Currency Selectors */
-        .currency-grid {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .select-box {
-            position: relative;
-        }
-
-        select {
-            width: 100%;
-            padding: 14px 10px 14px 40px; /* Space for flag */
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            appearance: none;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .flag-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.2rem;
-            pointer-events: none;
-        }
-
-        /* Swap Button */
-        .swap-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s ease;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-
-        .swap-btn:hover {
-            transform: rotate(180deg);
-            background: var(--primary-hover);
-        }
-
-        /* Convert Button */
-        .convert-btn {
-            width: 100%;
-            padding: 18px;
-            margin-top: 1.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            transition: transform 0.2s;
-        }
-
-        .convert-btn:active { transform: scale(0.98); }
-
-        /* Result Section */
-        .result-card {
-            margin-top: 2rem;
-            background: var(--input-bg);
-            padding: 1.5rem;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid var(--border);
-            position: relative;
-        }
-
-        .rate-info {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 5px;
-        }
-
-        .main-result {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin: 5px 0;
-            word-break: break-all;
-        }
-
-        .copy-icon {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            color: var(--text-sub);
-            cursor: pointer;
-            font-size: 1.1rem;
-        }
-
-        .copy-icon:hover { color: var(--primary); }
-
-        /* Skeleton Loading */
-        .skeleton {
-            background: linear-gradient(90deg, var(--border) 25%, var(--input-bg) 50%, var(--border) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 15px;
             border-radius: 8px;
-            color: transparent !important;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            outline: none;
+            transition: 0.3s;
         }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: var(--neon-shadow); }
 
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        /* Currency Row */
+        .currency-row { display: flex; gap: 10px; align-items: flex-end; }
+        .swap-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            width: 45px; height: 45px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
         }
+        .swap-btn:hover { background: var(--primary); color: #000; box-shadow: var(--neon-shadow); }
 
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #333;
+        /* --- FEE SLIDER --- */
+        .fee-section { margin-top: 10px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; }
+        .range-slider { width: 100%; -webkit-appearance: none; height: 4px; background: #333; outline: none; border-radius: 2px; }
+        .range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px var(--accent); }
+        .fee-display { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; color: var(--accent); }
+
+        /* --- BUTTON --- */
+        .convert-btn {
+            margin-top: auto;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border: none;
             color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            opacity: 0;
-            transition: all 0.4s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            z-index: 1000;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
         }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
+        .convert-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(112, 0, 255, 0.4); }
+        .convert-btn::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
         }
+        @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
 
-        .toast.error { background: #ef4444; }
-        .toast.success { background: #10b981; }
+        /* --- RIGHT PANEL (VISUALS) --- */
+        .right-panel { display: grid; grid-template-rows: auto 1fr; gap: 20px; }
+        
+        /* CARD RESULT */
+        .result-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-chip { width: 40px; height: 30px; background: linear-gradient(135deg, #ffd700, #b8860b); border-radius: 5px; margin-bottom: 20px; }
+        .card-label { font-size: 0.8rem; color: #aaa; letter-spacing: 1px; }
+        .card-value { font-family: 'Rajdhani', sans-serif; font-size: 2.5rem; font-weight: 700; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .card-sub { font-size: 0.9rem; color: var(--primary); }
+        .card-logo { position: absolute; top: 20px; right: 20px; font-weight: bold; font-style: italic; font-size: 1.2rem; color: rgba(255,255,255,0.5); }
+
+        /* CHART */
+        .chart-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 15px;
+            border: var(--glass-border);
+            position: relative;
+        }
+        
+        .loader-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 17, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid var(--secondary); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s infinite linear;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="header">
-        <div class="brand"><i class="fas fa-bolt"></i> Xyro Pro</div>
-        <button class="theme-toggle" onclick="toggleTheme()">
-            <i class="fas fa-moon" id="theme-icon"></i>
-        </button>
-    </div>
+<!-- SOUNDS -->
+<audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
-    <div class="input-wrapper">
-        <label class="label">Amount</label>
-        <input type="number" class="amount-input" id="amount" value="100" placeholder="0.00" onkeydown="if(event.key === 'Enter') convert()">
-    </div>
-
-    <div class="currency-grid">
-        <div class="select-box">
-            <span class="flag-icon" id="flag-from">🇺🇸</span>
-            <select id="from" onchange="updateFlags()">
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-                <option value="PKR">PKR</option>
-                <option value="INR">INR</option>
-                <option value="CAD">CAD</option>
-                <option value="AED">AED</option>
-                <option value="SAR">SAR</option>
-                <option value="JPY">JPY</option>
-                <option value="CNY">CNY</option>
-                <option value="TRY">TRY</option>
-            </select>
-        </div>
-
-        <button class="swap-btn" onclick="swap()">
-            <i class="fas fa-exchange-alt"></i>
-        </button>
-
-        <div class="select-box">
-            <span class="flag-icon" id="flag-to">🇵🇰</span>
-            <select id="to" onchange="updateFlags()">
-                <option value="PKR" selected>PKR</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-                <option value="INR">INR</option>
-                <option value="AED">AED</option>
-                <option value="CAD">CAD</option>
-            </select>
-        </div>
-    </div>
-
-    <button class="convert-btn" onclick="convert()">Check Rates</button>
-
-    <div class="result-card" id="result-area" style="display:none;">
-        <i class="far fa-copy copy-icon" onclick="copyResult()" title="Copy"></i>
-        <div class="rate-info" id="unit-rate">1 USD = 0.00 PKR</div>
-        <div class="main-result" id="total-result">0.00</div>
+<!-- TICKER -->
+<div class="ticker-wrap">
+    <div class="ticker">
+        <div class="ticker-item">USD/PKR +0.5%</div>
+        <div class="ticker-item">EUR/USD -0.2%</div>
+        <div class="ticker-item">BTC/USD +1.2%</div>
+        <div class="ticker-item">FAZ TERMINAL ONLINE</div>
+        <div class="ticker-item">LIVE RATES</div>
+        <div class="ticker-item">GBP/PKR +0.8%</div>
     </div>
 </div>
 
-<div id="toast" class="toast">Message</div>
+<div class="terminal-container">
+    
+    <!-- LEFT PANEL: CONTROLS -->
+    <div class="panel">
+        <div class="panel-title"><i class="fas fa-terminal"></i> FAZ COMMAND</div>
+        
+        <div class="input-group">
+            <label class="input-label">Amount</label>
+            <input type="number" id="amount" value="100" placeholder="0.00">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Currencies</label>
+            <div class="currency-row">
+                <select id="from">
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - Pound</option>
+                    <option value="PKR">PKR - Rupee</option>
+                    <option value="INR">INR - Rupee</option>
+                    <option value="AED">AED - Dirham</option>
+                    <option value="CNY">CNY - Yuan</option>
+                </select>
+                <button class="swap-btn" onclick="swap()"><i class="fas fa-sync"></i></button>
+            </div>
+            <div style="margin-top: 10px;">
+                <select id="to">
+                    <option value="PKR" selected>PKR - Pakistani Rupee</option>
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - Pound</option>
+                    <option value="INR">INR - Rupee</option>
+                    <option value="AED">AED - Dirham</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="fee-section">
+            <div class="fee-display">
+                <span>Bank Fee / Tax</span>
+                <span id="fee-val">0%</span>
+            </div>
+            <input type="range" class="range-slider" id="feeSlider" min="0" max="10" value="0" step="0.5" oninput="updateFeeLabel()">
+        </div>
+
+        <button class="convert-btn" onclick="processTransaction()">Execute Trade</button>
+    </div>
+
+    <!-- RIGHT PANEL: VISUALS -->
+    <div class="right-panel">
+        
+        <!-- CREDIT CARD RESULT -->
+        <div class="result-card" id="card-display">
+            <div class="card-logo">FAZ PLATINUM</div>
+            <div class="card-chip"></div>
+            
+            <div>
+                <div class="card-label">TOTAL VALUE</div>
+                <div class="card-value" id="main-result">0.00</div>
+                <div class="card-sub" id="sub-result">1 USD = 0.00 PKR</div>
+            </div>
+
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; font-size: 0.8rem; color: #888;">
+                <span id="timestamp">--:--</span>
+                <span id="fee-deduction">Fee: 0.00</span>
+            </div>
+        </div>
+
+        <!-- CHART CONTAINER -->
+        <div class="chart-container panel">
+            <div class="loader-overlay" id="loader">
+                <div class="spinner"></div>
+            </div>
+            <div class="panel-title" style="font-size: 1rem;"><i class="fas fa-chart-line"></i> Market Volatility Index</div>
+            <canvas id="marketChart"></canvas>
+        </div>
+
+    </div>
+</div>
 
 <script>
-    // --- 1. CONFIG & UTILS ---
-    const flagMap = {
-        'USD': '🇺🇸', 'EUR': '🇪🇺', 'GBP': '🇬🇧', 'PKR': '🇵🇰',
-        'INR': '🇮🇳', 'CAD': '🇨🇦', 'AED': '🇦🇪', 'SAR': '🇸🇦',
-        'JPY': '🇯🇵', 'CNY': '🇨🇳', 'TRY': '🇹🇷'
-    };
+    // --- SETUP CHART ---
+    const ctx = document.getElementById('marketChart').getContext('2d');
+    let marketChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['1m', '5m', '15m', '30m', '1h', '4h', 'Now'],
+            datasets: [{
+                label: 'Trend',
+                data: [10, 12, 11, 14, 13, 15, 16], // Dummy start data
+                borderColor: '#00f2ff',
+                backgroundColor: 'rgba(0, 242, 255, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                y: { display: false }
+            }
+        }
+    });
 
-    function updateFlags() {
-        document.getElementById('flag-from').textContent = flagMap[document.getElementById('from').value] || '🌐';
-        document.getElementById('flag-to').textContent = flagMap[document.getElementById('to').value] || '🌐';
+    // --- UTILS ---
+    function playSound() {
+        const audio = document.getElementById('clickSound');
+        audio.currentTime = 0;
+        audio.volume = 0.3;
+        // audio.play().catch(e => {}); // Commented out to prevent auto-play policy issues, uncomment if needed
+    }
+
+    function updateFeeLabel() {
+        const val = document.getElementById('feeSlider').value;
+        document.getElementById('fee-val').textContent = val + '%';
+        // Recalculate if result exists
+        const currentRes = document.getElementById('main-result').innerText;
+        if(currentRes !== "0.00") processTransaction(true); 
     }
 
     function swap() {
-        const fromEl = document.getElementById('from');
-        const toEl = document.getElementById('to');
-        const temp = fromEl.value;
-        fromEl.value = toEl.value;
-        toEl.value = temp;
-        updateFlags();
-        // Optional: Trigger convert immediately on swap
-        // convert(); 
+        playSound();
+        const from = document.getElementById('from');
+        const to = document.getElementById('to');
+        const temp = from.value;
+        from.value = to.value;
+        to.value = temp;
     }
 
-    // --- 2. THEME HANDLING ---
-    function toggleTheme() {
-        const body = document.body;
-        const icon = document.getElementById('theme-icon');
-        
-        if (body.getAttribute('data-theme') === 'dark') {
-            body.removeAttribute('data-theme');
-            icon.className = 'fas fa-moon';
-        } else {
-            body.setAttribute('data-theme', 'dark');
-            icon.className = 'fas fa-sun';
+    function generateGraphData(baseValue) {
+        // Create a simulated realistic-looking fluctuation around the base value
+        let data = [];
+        let labels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Today'];
+        for(let i=0; i<7; i++) {
+            let fluctuation = (Math.random() - 0.5) * (baseValue * 0.02); // 2% variance
+            data.push(baseValue + fluctuation);
         }
+        return { labels, data };
     }
 
-    // --- 3. API & LOGIC ---
-    async function convert() {
-        const amountInput = document.getElementById('amount');
+    // --- MAIN LOGIC ---
+    async function processTransaction(isUpdateOnly = false) {
+        if(!isUpdateOnly) playSound();
+        
+        const amount = parseFloat(document.getElementById('amount').value);
         const from = document.getElementById('from').value;
         const to = document.getElementById('to').value;
-        const resultArea = document.getElementById('result-area');
-        const unitRateEl = document.getElementById('unit-rate');
-        const totalResultEl = document.getElementById('total-result');
+        const feePercent = parseFloat(document.getElementById('feeSlider').value);
         
-        const amount = parseFloat(amountInput.value);
+        if(!amount) return;
 
-        if (!amount || amount <= 0) {
-            showToast("Please enter a valid amount", "error");
-            return;
-        }
+        const loader = document.getElementById('loader');
+        if(!isUpdateOnly) loader.style.display = 'flex';
 
-        // Show Loading State (Skeleton)
-        resultArea.style.display = 'block';
-        totalResultEl.classList.add('skeleton');
-        unitRateEl.classList.add('skeleton');
-        totalResultEl.textContent = "0000.00"; // Placeholder for width
-
+        // Use the API Key URL
         const url = `https://api.xyro.site/currency/convert?amount=${amount}&from=${from}&to=${to}`;
 
         try {
-            const response = await fetch(url);
-            const json = await response.json();
+            // If just updating fee, we don't need to fetch if we have global Rate (omitted for simplicity, just re-fetch)
+            const res = await fetch(url);
+            const json = await res.json();
 
-            // Validate specifically for "creator": "KimKiro" format
-            if (!json.status) {
-                throw new Error("API returned false status");
+            if(!isUpdateOnly) loader.style.display = 'none';
+
+            if(json.status) {
+                // Determine Raw Value
+                let rawValue = 0;
+                if(typeof json.data === 'number') rawValue = json.data;
+                else if(json.data.result) rawValue = json.data.result;
+                else if(json.data.converted) rawValue = json.data.converted;
+                else if(json.data.rate) rawValue = json.data.rate * amount;
+
+                // Calculate Fee
+                const feeAmount = rawValue * (feePercent / 100);
+                const finalValue = rawValue - feeAmount;
+
+                // Update UI
+                const resultDisplay = document.getElementById('main-result');
+                const subDisplay = document.getElementById('sub-result');
+                const feeDisplay = document.getElementById('fee-deduction');
+                const timeDisplay = document.getElementById('timestamp');
+
+                // Animate numbers
+                resultDisplay.innerText = finalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " " + to;
+                
+                // Single Unit Rate
+                const unitRate = rawValue / amount;
+                subDisplay.innerText = `1 ${from} = ${unitRate.toFixed(4)} ${to}`;
+                
+                feeDisplay.innerText = `Fee: -${feeAmount.toFixed(2)} ${to}`;
+                timeDisplay.innerText = new Date().toLocaleTimeString();
+
+                // Update Chart (Simulated based on this rate)
+                if(!isUpdateOnly) {
+                    const graphData = generateGraphData(unitRate);
+                    marketChart.data.labels = graphData.labels;
+                    marketChart.data.datasets[0].data = graphData.data;
+                    marketChart.update();
+                }
+
+            } else {
+                alert("FAZ Terminal Error: API Status False");
             }
-
-            // Extract logic based on unknown inner structure of 'data'
-            let finalValue = 0;
-            
-            // Case A: data is just a number (e.g. "data": 27800)
-            if (typeof json.data === 'number') {
-                finalValue = json.data;
-            } 
-            // Case B: data is an object (e.g. "data": { "result": 27800 })
-            else if (typeof json.data === 'object') {
-                finalValue = json.data.result || json.data.converted || json.data.rate * amount || 0;
-            }
-
-            if (finalValue === 0) throw new Error("Could not parse result");
-
-            // Remove Skeleton
-            totalResultEl.classList.remove('skeleton');
-            unitRateEl.classList.remove('skeleton');
-
-            // Format Numbers
-            const formattedTotal = finalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            
-            // Calculate Unit Rate (1 Unit)
-            const unitRate = finalValue / amount;
-            const formattedUnit = unitRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 });
-
-            // Update UI
-            totalResultEl.textContent = `${formattedTotal} ${to}`;
-            unitRateEl.textContent = `1 ${from} ≈ ${formattedUnit} ${to}`;
-
-        } catch (error) {
-            console.error(error);
-            totalResultEl.classList.remove('skeleton');
-            unitRateEl.classList.remove('skeleton');
-            resultArea.style.display = 'none';
-            showToast("Conversion failed. Try again.", "error");
+        } catch(e) {
+            console.error(e);
+            loader.style.display = 'none';
         }
     }
-
-    // --- 4. TOAST NOTIFICATIONS ---
-    function showToast(msg, type = 'success') {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.className = `toast show ${type}`;
-        setTimeout(() => {
-            toast.className = 'toast'; // Hide
-        }, 3000);
-    }
-
-    function copyResult() {
-        const text = document.getElementById('total-result').textContent;
-        if(text && text !== "0.00") {
-            navigator.clipboard.writeText(text);
-            showToast("Result copied to clipboard!");
-        }
-    }
-
-    // Init
-    updateFlags();
 </script>
 
 </body>
