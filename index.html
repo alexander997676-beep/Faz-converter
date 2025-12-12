@@ -209,11 +209,11 @@
         </div>
         
         <div class="input-wrapper">
-            <input type="number" class="big-input" id="amount" value="100" placeholder="0">
+            <input type="number" class="big-input" id="amount" value="10" placeholder="0">
             <div style="font-size: 0.9rem; color: var(--text-muted);">Enter Amount</div>
         </div>
 
-        <div class="live-result" id="main-result">100 USD = ... PKR</div>
+        <div class="live-result" id="main-result">10 USD = ... PKR</div>
 
         <div class="currency-row">
             <select id="from" onchange="convert()">
@@ -332,7 +332,10 @@
         
         loader.style.display = 'block';
 
-        const url = `https://api.xyro.site/currency/convert?amount=${amount}&from=${from}&to=${to}`;
+        // --- NEW API IMPLEMENTATION ---
+        // Using: real-time-global-exchange-rates.bjcoderx.workers.dev
+        // Params: From, Amount, To (Case sensitive)
+        const url = `https://real-time-global-exchange-rates.bjcoderx.workers.dev/?From=${from}&Amount=${amount}&To=${to}`;
 
         try {
             const res = await fetch(url);
@@ -340,16 +343,26 @@
             
             loader.style.display = 'none';
 
-            if(json.status) {
-                // 1. Parse Result
-                let val = 0;
-                // Handling API variations
-                if(typeof json.data === 'number') val = json.data;
-                else if(json.data.result) val = json.data.result;
-                else if(json.data.converted) val = json.data.converted;
-                else if(json.data.rate) val = json.data.rate * amount;
+            // New API parsing logic
+            let val = 0;
 
-                // Calculate Single Unit Rate
+            // Check if response has 'result' or 'data' or is just a number
+            if (json.result !== undefined) {
+                val = parseFloat(json.result);
+            } else if (json.data !== undefined) {
+                val = parseFloat(json.data);
+            } else if (typeof json === 'number') {
+                val = json;
+            } else {
+                // Fallback attempt
+                console.log("Full Response:", json);
+            }
+
+            // If value is found
+            if(val || val === 0) {
+                
+                // Calculate Single Unit Rate (for cheat sheet & inverse)
+                // If the API returns total converted amount:
                 const unitRate = amount > 0 ? val / amount : 0;
 
                 // 2. Update Main Display
@@ -368,10 +381,10 @@
 
                 // 5. Update Chart (Simulation)
                 updateChartSimulation(unitRate);
-
             }
+
         } catch(e) {
-            console.error(e);
+            console.error("API Error:", e);
             loader.style.display = 'none';
         }
     }
